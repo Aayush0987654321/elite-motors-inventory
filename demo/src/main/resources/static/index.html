@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Elite Motors | Premium Inventory</title>
+    <style>
+       
+    /* 1. Global Styles & Background */
+    body { 
+        font-family: 'Poppins', 'Segoe UI', sans-serif; 
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+        min-height: 100vh;
+        margin: 0;
+        padding-bottom: 50px;
+    }
+
+    .container { 
+        max-width: 1000px; 
+        margin-top: 30px;
+    }
+
+    /* 2. Admin Protection - The Lock */
+    .admin-only { 
+        display: none !important; 
+    }
+
+    /* 3. Hero Section Styling */
+    .hero-gradient {
+        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+            url('/hero-car.jpg');
+        background-size: cover;
+        background-position: center;
+        border-radius: 20px;
+        padding: 80px 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+
+    /* 4. Card & Table Styling */
+    .card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: none;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead {
+        background-color: #f8f9fa;
+    }
+
+    /* 5. Buttons & Badges */
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success { background-color: #28a745; border: none; }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3); }
+
+    .badge-high {
+        background: #ff4757;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+
+    /* 6. Admin Panel Highlight */
+    #adminSection {
+        background: #fff3cd;
+        border: 2px dashed #ffc107;
+        padding: 20px;
+        border-radius: 20px;
+        margin-top: 40px;
+    }
+    tbody tr {
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+tbody tr:hover {
+    background-color: #f0f7ff !important;
+    transform: scale(1.01);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+ footer {
+    background: #2d3436;
+    color: #dfe6e9;
+    padding: 30px 0;
+    margin-top: 50px;
+    border-top: 5px solid #0d6efd;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+       <div class="d-flex justify-content-between align-items-center py-4 px-2">
+    <div class="d-flex align-items-center">
+        <h2 class="text-primary fw-bold m-0" style="letter-spacing: -1px;">💎 ELITE<span class="text-dark">MOTORS</span></h2>
+    </div>
+    <div class="d-flex align-items-center">
+        <span id="userGreeting" class="me-3 badge bg-white text-dark shadow-sm py-2 px-3 border" style="font-size: 0.9rem;"></span>
+        
+        <a href="/login" id="loginBtn" class="btn btn-primary shadow-sm">Admin Login</a>
+        
+        <form action="/logout" method="post" style="display: inline;">
+            <button type="submit" id="logoutBtn" class="btn btn-outline-danger ms-2" style="display: none;">Logout</button>
+        </form>
+    </div>
+</div>
+
+        <div class="hero-gradient text-white text-center mb-5 shadow">
+    <h1 class="display-4 fw-bold">Find Your Dream Drive</h1>
+    <p class="lead text-light opacity-75">Browse our premium selection of high-performance vehicles.</p>
+    <a href="#inventorySection" class="btn btn-primary btn-lg px-5 mt-3 shadow">View Inventory</a>
+</div>
+
+        <div id="inventorySection" class="card shadow-sm mb-5">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">📋 Current Inventory</h3>
+            </div>
+            <div class="card-body">
+                <input type="text" id="searchInput" onkeyup="filterCars()" placeholder="🔍 Search by brand..." class="form-control mb-3">
+                <table id="carTable" class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Brand</th>
+                            <th>Model</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="adminSection" class="admin-only">
+            <div class="card border-warning shadow-sm mb-4">
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0">🛠️ Admin: Manage Inventory</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-4"><input type="text" id="brand" class="form-control" placeholder="Brand"></div>
+                        <div class="col-md-3"><input type="text" id="model" class="form-control" placeholder="Model"></div>
+                        <div class="col-md-3"><input type="number" id="price" class="form-control" placeholder="Price"></div>
+                        <div class="col-md-2"><button id="saveBtn" class="btn btn-success w-100" onclick="addCar()">Save Car</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-dark shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">📩 Customer Inquiries</h4>
+                </div>
+                <div class="card-body p-0">
+                    <table id="inquiryTable" class="table table-striped mb-0">
+                        <thead>
+                            <tr><th>Customer</th><th>Email</th><th>Car ID</th><th>Priority</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let editId = null;
+
+        async function loadInventory() {
+            const res = await fetch('/api/cars');
+            const cars = await res.json();
+            const tbody = document.querySelector('#carTable tbody');
+            tbody.innerHTML = '';
+
+            if (cars.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No cars available.</td></tr>`;
+            } else {
+                cars.forEach((car, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><span class="fw-bold">${car.brand}</span></td>
+                            <td>${car.model}</td>
+                            <td>$${Number(car.price).toLocaleString()}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="showInquiryForm(${car.id})">Interested</button>
+                                <button class="btn btn-info btn-sm admin-only" onclick="editCar(${car.id}, '${car.brand}', '${car.model}', ${car.price})">Edit</button>
+                                <button class="btn btn-danger btn-sm admin-only" onclick="deleteCar(${car.id})">Delete</button>
+                            </td>
+                        </tr>`;
+                });
+            }
+            checkAdmin(); 
+        }
+
+      async function checkAdmin() {
+    try {
+        const nameRes = await fetch('/api/me');
+        const username = await nameRes.text();
+
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const greeting = document.getElementById('userGreeting');
+
+        if (username && username !== "") {
+            // 1. Update UI for Logged-In User
+            greeting.innerHTML = `Welcome, <strong>${username}</strong> 👋`;
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (logoutBtn) logoutBtn.style.display = 'inline-block';
+
+            // 2. Unlock Admin Panels
+            const inquiryRes = await fetch('/api/inquiries');
+            if (inquiryRes.ok) {
+                const adminBox = document.getElementById('adminSection');
+                if (adminBox) {
+                    adminBox.classList.remove('admin-only');
+                    adminBox.style.setProperty('display', 'block', 'important');
+                }
+                
+                // Show Edit/Delete buttons in the table
+                document.querySelectorAll('.btn.admin-only').forEach(btn => {
+                    btn.style.setProperty('display', 'inline-block', 'important');
+                });
+                
+                loadInquiries();
+            }
+        } else {
+            // Guest Mode
+            if (loginBtn) loginBtn.style.display = 'inline-block';
+            if (logoutBtn) logoutBtn.style.display = 'none';
+            greeting.style.display = 'none';
+        }
+    } catch (err) {
+        console.log("Not logged in.");
+    }
+}
+        // ... Keep your showInquiryForm, loadInquiries, addCar, editCar, deleteCar, and filterCars exactly as they were ...
+        // (Just ensure they are inside this <script> tag)
+
+        async function showInquiryForm(carId) {
+            const name = prompt("Please enter your name:");
+            const email = prompt("Please enter your email:");
+            if (name && email) {
+                await fetch('/api/inquiries', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({customerName: name, customerEmail: email, carId: carId})
+                });
+                alert("Thank you! Our team will contact you shortly.");
+                if(document.querySelector('.admin-visible')) loadInquiries();
+            }
+        }
+
+        async function loadInquiries() {
+            const res = await fetch('/api/inquiries');
+            if (!res.ok) return;
+            const iqs = await res.json();
+            const tbody = document.querySelector('#inquiryTable tbody');
+            tbody.innerHTML = iqs.map(iq => `
+                <tr>
+                    <td>${iq.customerName}</td>
+                    <td>${iq.customerEmail}</td>
+                    <td>Car #${iq.carId}</td>
+                    <td><span class="badge ${iq.priority.includes('High') ? 'bg-danger' : 'bg-secondary'}">${iq.priority}</span></td>
+                </tr>`).join('');
+        }
+
+        async function addCar() {
+            const data = { 
+                brand: document.getElementById('brand').value, 
+                model: document.getElementById('model').value, 
+                price: document.getElementById('price').value 
+            };
+            if(!data.brand || !data.model || !data.price) return alert("Fill all fields");
+            await fetch(editId ? `/api/cars/${editId}` : '/api/cars', {
+                method: editId ? 'PUT' : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            editId = null;
+            document.getElementById('brand').value = '';
+            document.getElementById('model').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('saveBtn').innerText = "Save Car";
+            loadInventory();
+        }
+
+        function editCar(id, brand, model, price) {
+            editId = id;
+            document.getElementById('brand').value = brand;
+            document.getElementById('model').value = model;
+            document.getElementById('price').value = price;
+            document.getElementById('saveBtn').innerText = "Update Car";
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        async function deleteCar(id) {
+            if(confirm("Delete this car?")) {
+                await fetch(`/api/cars/${id}`, {method: 'DELETE'});
+                loadInventory();
+            }
+        }
+
+        function filterCars() {
+            let val = document.getElementById("searchInput").value.toLowerCase();
+            document.querySelectorAll("#carTable tbody tr").forEach(row => {
+                row.style.display = row.children[1].innerText.toLowerCase().includes(val) ? "" : "none";
+            });
+        }
+
+        window.onload = loadInventory;
+    </script>
+    <footer>
+    <div class="container text-center">
+        <p class="mb-1">© 2026 💎 ELITE MOTORS | Premium Automotive Group</p>
+        <small class="text-secondary">Official Inventory Management System</small>
+    </div>
+</footer>
+</body>
+</html>
